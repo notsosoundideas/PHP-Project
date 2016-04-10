@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Main page</title>
+		<link href ="css/bootstrap.min.css" rel ="stylesheet">
+	</head>
+	<body>
+	<!--JQUERY MUST LOAD BEFORE BOOTSTRAP AT ALL TIMES-->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+		<script src ="js/bootstrap.min.js"></script>
+		<nav class="navbar navbar-inverse navbar-static-top">
+			<div class ="container-fluid">
+				<div class="navbar-header">
+					<a href ="index.php" class = "navbar-brand">ReadingHelper</a>
+					<!--button that only appears on small screens to show the navHeaderCollapse div-->
+					<button type ="button" class ="navbar-toggle" data-toggle="collapse" data-target=".navHeaderCollapse">
+					<!-- the button is 3 bars on top of each other-->	
+						<span class ="icon-bar"></span>
+						<span class ="icon-bar"></span>
+						<span class ="icon-bar"></span>
+					</button>
+				</div>
+				<div class ="collapse navbar-collapse navHeaderCollapse">
+					<ul class ="nav navbar-nav">
+						<li><a href ="index.php">Home</a></li>
+						<li><a href ="input.php">Input</a></li>
+						<li><a href ="quiz.php">Quiz</a></li>
+						<li class ="active"><a href ="">Help</a></li>
+					</ul>
+					<ul class = "nav navbar-nav navbar-right">
+					<!--this should be a php doc too-->
+						<li><a href ="index.php">Log In</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class ="container">
+			<h1>Help</h1>
+			<div class ="row">
+			<!--it's still in columns at medium screen size and it uses 6 of the 12 grid boxes-->
+				<div class ="col-md-6">
+					<h3>Login</h3>
+					<p>If you have already made an account, Sign in here.
+				</div>
+				<div class ="col-md-6">
+					<h3>Register</h3>
+					<p>If you haven't already, Make an account now.
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

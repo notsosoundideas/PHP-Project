@@ -64,110 +64,120 @@ if(!$user['LOGGED_IN']){
 	die(header("Location: quiz.php"));
 }
 
-if(isset($_SESSION['BOOK']) && isset($_POST['AMOUNT'])){
-	if(!$_POST['AMOUNT']){
+if(isset($_SESSION['BOOK'])){
+	if(isset($_POST['AMOUNT']) OR isset($_SESSION['AMOUNT'])){
+		print var_dump($_POST);
+		print var_dump($_SESSION);
+		//if session because it proves it's been through the page before and so show show answers
+		//testing for 0 value below
+		if(!$_POST['AMOUNT'] && !$_SESSION['AMOUNT']){
+			unset($_SESSION['BOOK']);
+			//doesn't throw up an error but it does send you back so it should be fairly clear
+			die(header("Location: quiz.php"));
+		}
+		$bookidforsql = $_SESSION['BOOK'];
+		$_SESSION['AMOUNT'] = $_POST['AMOUNT'];
+		//pick chosen number of random question numbers 
+		//THIS IS GOING TO SERVE AS PROGRESSION, REMOVE 1 FROM ARRAY EVERYTIME QUESTION COMPLETE	
+		//PREVENT REPEAT QUESTIONS
+		$rnq = [];
+		while(count($rnq) < $_SESSION['AMOUNT']){
+			//rand can return the max number entered so it's -1 
+			$temp = rand(0,$_SESSION['MAXAMOUNT']-1);
+			if(!in_array($temp, $rnq)){
+				$rnq[] = $temp;
+			}
+			
+			
+		}
+		/*$error = '<div class="alert alert-danger" role="alert">
+			Book has been set, questions beign now. ID = '.$bookidforsql.' QUESTION NUM = '.$_SESSION["AMOUNT"].'</div>';*/
+		//mainthing
+		$questiondata = mysqli_query($connectsql,"SELECT * FROM question WHERE bookid = '$bookidforsql'");
+		$count = 0;
+		while($question = mysqli_fetch_array($questiondata)){
+			$printablequestion[$count]['text'] = $question['text'];
+			$printablequestion[$count]['correct'] = $question['correct'];
+			$printablequestion[$count]['other1'] = $question['other1'];
+			if(isset($question['other2'])){
+				$printablequestion[$count]['other2'] = $question['other2'];
+			}
+			else{
+				$printablequestion[$count]['other2'] = "";
+			}
+			if(isset($question['other3'])){
+				$printablequestion[$count]['other3'] = $question['other3'];
+			}
+			else{
+				$printablequestion[$count]['other3'] = "";
+			}
+			$count += 1;
+		}
+		for($i=0;$i<count($rnq);$i++){
+			$text[$i] = $printablequestion[$rnq[$i]]['text'];
+			//addind this part to the  html
+			if(isset($questionpart)){
+				unset($questionpart);
+			}
+			$questionpart[] = '	<h3>'.$text[$i].'</h3>
+									<div class="btn-group" data-toggle="buttons">
+										<p>
+										';
+			
+			$correct[$i] = $printablequestion[$rnq[$i]]['correct'];
+			//adding $correct to html
+			$questionpart[] = '	<label class="btn btn-default">
+									<input type="radio" name="options" id="button1" autocomplete="off"> '.$correct[$i].'
+								</label>
+								<p>
+								';
+			$other1[$i] = $printablequestion[$rnq[$i]]['other1'];
+			//adding other to $correct html
+			$questionpart[] = '	<label class="btn btn-default">
+									<input type="radio" name="options" id="button2" autocomplete="off"> '.$other1[$i].'
+								</label>
+								<p>
+								';								
+			if($printablequestion[$rnq[$i]]['other2'] != ""){
+				$other2[$i] = $printablequestion[$rnq[$i]]['other2'];
+				//only adds to html if it exists
+				$questionpart[] = '	<label class="btn btn-default">
+									<input type="radio" name="options" id="button3" autocomplete="off"> '.$other2[$i].'
+								</label>
+								<p>
+								';
+			}
+			else{
+				//more or less it doesn't matter what these say anymore only what goes into questionpart matters
+				$other2[$i] = "test_blank_answer_ignore";
+			}
+			if($printablequestion[$rnq[$i]]['other3'] != ""){
+				$other3[$i] = $printablequestion[$rnq[$i]]['other3'];
+				//addingin it to html only if exisitsing
+				$questionpart[] = '	<label class="btn btn-default">
+									<input type="radio" name="options" id="button4" autocomplete="off"> '.$other3[$i].'
+								</label>
+								<p>
+								';
+			}
+			else{
+				$other3[$i] = "test_blank_answer_ignore";
+			}
+			$questionpart[] = '</div>';
+			$structuredquestionpart[$i] = implode($questionpart);
+		}
+		//okay, so the problem is structuredquestionpart[$i] still contains everything from the first loop iteration when doing the second
+		//PRINT AMOUNT NUMBER OF QUESTIONPARTS
+		$structuredquestionpart[] = '<input class ="btn btn-default navbar-left" name="selected" type="submit" value="Next"/>';
+		$finalquestion = implode($structuredquestionpart);
+		/* THIS WILL HAVE TO HAPPEN AT SOME POINT
+		unset($_SESSION['AMOUNT']);
 		unset($_SESSION['BOOK']);
-		//doesn't throw up an error but it does send you back so it should be fairly clear
+		unset($_SESSION['MAXAMOUNT']);*/ 
+	}
+	else{
 		die(header("Location: quiz.php"));
 	}
-	$bookidforsql = $_SESSION['BOOK'];
-	$_SESSION['AMOUNT'] = $_POST['AMOUNT'];
-	//pick chosen number of random question numbers 
-//THIS IS GOING TO SERVE AS PROGRESSION, REMOVE 1 FROM ARRAY EVERYTIME QUESTION COMPLETE	
-//PREVENT REPEAT QUESTIONS
-	$rnq = [];
-	while(count($rnq) < $_SESSION['AMOUNT']){
-		//rand can return the max number entered so it's -1 
-		$temp = rand(0,$_SESSION['MAXAMOUNT']-1);
-		if(!in_array($temp, $rnq)){
-			$rnq[] = $temp;
-		}
-		
-		
-	}
-	/*$error = '<div class="alert alert-danger" role="alert">
-		Book has been set, questions beign now. ID = '.$bookidforsql.' QUESTION NUM = '.$_SESSION["AMOUNT"].'</div>';*/
-	//mainthing
-	$questiondata = mysqli_query($connectsql,"SELECT * FROM question WHERE bookid = '$bookidforsql'");
-	$count = 0;
-	while($question = mysqli_fetch_array($questiondata)){
-		$printablequestion[$count]['text'] = $question['text'];
-		$printablequestion[$count]['correct'] = $question['correct'];
-		$printablequestion[$count]['other1'] = $question['other1'];
-		if(isset($question['other2'])){
-			$printablequestion[$count]['other2'] = $question['other2'];
-		}
-		else{
-			$printablequestion[$count]['other2'] = "";
-		}
-		if(isset($question['other3'])){
-			$printablequestion[$count]['other3'] = $question['other3'];
-		}
-		else{
-			$printablequestion[$count]['other3'] = "";
-		}
-		$count += 1;
-	}
-	for($i=0;$i<count($rnq);$i++){
-		$text[$i] = $printablequestion[$rnq[$i]]['text'];
-		//addind this part to the  html
-		if(isset($questionpart)){
-			unset($questionpart);
-		}
-		$questionpart[] = '	<h3>'.$text[$i].'</h3>
-							<form class ="form-horizontal" action="question.php" method="post">
-								<div class="btn-group" data-toggle="buttons">
-									<p>
-									';
-		
-		$correct[$i] = $printablequestion[$rnq[$i]]['correct'];
-		//adding $correct to html
-		$questionpart[] = '	<label class="btn btn-default">
-								<input type="radio" name="options" id="option1" autocomplete="off"> '.$correct[$i].'
-							</label>
-							<p>
-							';
-		$other1[$i] = $printablequestion[$rnq[$i]]['other1'];
-		//adding other to $correct html
-		$questionpart[] = '	<label class="btn btn-default">
-								<input type="radio" name="options" id="option2" autocomplete="off"> '.$other1[$i].'
-							</label>
-							<p>
-							';								
-		if($printablequestion[$rnq[$i]]['other2'] != ""){
-			$other2[$i] = $printablequestion[$rnq[$i]]['other2'];
-			//only adds to html if it exists
-			$questionpart[] = '	<label class="btn btn-default">
-								<input type="radio" name="options" id="option3" autocomplete="off"> '.$other2[$i].'
-							</label>
-							<p>
-							';
-		}
-		else{
-			$other2[$i] = "test_blank_answer_ignore";
-		}
-		if($printablequestion[$rnq[$i]]['other3'] != ""){
-			$other3[$i] = $printablequestion[$rnq[$i]]['other3'];
-			//addingin it to html only if exisitsing
-			$questionpart[] = '	<label class="btn btn-default">
-								<input type="radio" name="options" id="option4" autocomplete="off"> '.$other3[$i].'
-							</label>
-							<p>
-							';
-		}
-		else{
-			$other3[$i] = "test_blank_answer_ignore";
-		}
-		$questionpart[] = '</div></form>';
-		$structuredquestionpart[$i] = implode($questionpart);
-	}
-	//okay, so the problem is structuredquestionpart[$i] still contains everything from the first loop iteration when doing the second
-	//PRINT AMOUNT NUMBER OF QUESTIONPARTS
-//	$structuredquestionpart[] = '<input class ="btn btn-default navbar-left" name="selected" type="submit" value="Next"/>';
-	$finalquestion = implode($structuredquestionpart);
-	unset($_SESSION['AMOUNT']);
-	unset($_SESSION['BOOK']);
-	unset($_SESSION['MAXAMOUNT']);
 }
 else{
 	die(header("Location: quiz.php"));
@@ -215,10 +225,11 @@ if($auth = "student"){
 						<div class ="row">
 						<!--it\'s still in columns at medium screen size and it uses 6 of the 12 grid boxes-->
 							<div class ="col-md-6">
-							'.$finalquestion.'
+								<form class ="form-horizontal" action="question.php" method="post">
+									'.$finalquestion.'
+								</form>
 							</div>
 							<div class ="col-md-6">
-							<input class ="btn btn-default navbar-left" name="selected" type="submit" value="Next"/>
 							</div>
 						</div>
 					</div>

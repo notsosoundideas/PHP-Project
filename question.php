@@ -65,6 +65,11 @@ if(!$user['LOGGED_IN']){
 }
 
 if(isset($_SESSION['BOOK']) && isset($_POST['AMOUNT'])){
+	if(!$_POST['AMOUNT']){
+		unset($_SESSION['BOOK']);
+		//doesn't throw up an error but it does send you back so it should be fairly clear
+		die(header("Location: quiz.php"));
+	}
 	$bookidforsql = $_SESSION['BOOK'];
 	$_SESSION['AMOUNT'] = $_POST['AMOUNT'];
 	//pick chosen number of random question numbers 

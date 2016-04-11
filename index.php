@@ -89,7 +89,7 @@ if(isset($_POST['action'])){
 					if(substr($email, strlen($email)-9) == "@dhsb.org" && filter_var($email, FILTER_VALIDATE_EMAIL)){
 						if(is_numeric(substr($email,0,2))){
 //							$user['ACCESS'] = 0;
-							$access = NULL;
+							$access = 0;
 						}
 						else{
 							$access = 1;
@@ -362,8 +362,6 @@ else{
 								<p>Current Work is set below.
 							</div>
 							<div class ="col-md-6">
-								<h3>Todo</h3>
-								<p>Words go here
 							</div>
 						</div>
 					</div>

@@ -5,8 +5,6 @@ session_start();
 $user = array("LOGGED_IN" => false);
 $added = "";
 $error = "";
-//soo, The point of this php doc is
-//If there is only a username/pass in $_POST try to login, else add details to dba_close
 
 //specify info about the database for the connection to use
 $db_name = 'test';
